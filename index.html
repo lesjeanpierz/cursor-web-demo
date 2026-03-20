@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cursor Demo</title>
+</head>
+<body>
+
+  <h1>Mes idées</h1>
+
+  <input id="input" placeholder="Nouvelle idée" />
+  <button onclick="addIdea()">Ajouter</button>
+
+  <ul id="list"></ul>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+    const supabase = supabase.createClient(
+      "https://ifyxcimmwklysdmatcly.supabase.co",
+      "sb_publishable_pd7bLG8agWF0bvinOBdMdw_VTmQHrYT"
+    );
+
+    async function loadIdeas() {
+      const { data } = await supabase.from('ideas').select('*');
+
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      data.forEach(i => {
+        const li = document.createElement("li");
+        li.textContent = i.title;
+        list.appendChild(li);
+      });
+    }
+
+    async function addIdea() {
+      const input = document.getElementById("input");
+
+      await supabase.from('ideas').insert({
+        title: input.value
+      });
+
+      input.value = "";
+      loadIdeas();
+    }
+
+    loadIdeas();
+  </script>
+
+</body>
+</html>
