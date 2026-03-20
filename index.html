@@ -1,51 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cursor Demo</title>
 </head>
 <body>
-
   <h1>Mes idées</h1>
 
   <input id="input" placeholder="Nouvelle idée" />
-  <button onclick="addIdea()">Ajouter</button>
+  <button id="addBtn">Ajouter</button>
+
+  <p id="status"></p>
 
   <ul id="list"></ul>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    const supabase = supabase.createClient(
-      "https://ifyxcimmwklysdmatcly.supabase.co",
-      "sb_publishable_pd7bLG8agWF0bvinOBdMdw_VTmQHrYT"
-    );
+    const SUPABASE_URL = "https://ifyxcimmwklysdmatcly.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_pd7bLG8agWF0bvinOBdMdw_VTmQHrYT";
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const input = document.getElementById("input");
+    const addBtn = document.getElementById("addBtn");
+    const list = document.getElementById("list");
+    const statusEl = document.getElementById("status");
+
+    function setStatus(message, isError = false) {
+      statusEl.textContent = message;
+      statusEl.style.color = isError ? "red" : "green";
+    }
 
     async function loadIdeas() {
-      const { data } = await supabase.from('ideas').select('*');
+      setStatus("Chargement...");
 
-      const list = document.getElementById("list");
+      const { data, error } = await supabaseClient
+        .from("ideas")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error("Erreur lecture :", error);
+        setStatus("Erreur lecture : " + error.message, true);
+        return;
+      }
+
       list.innerHTML = "";
 
-      data.forEach(i => {
+      if (!data || data.length === 0) {
+        setStatus("Aucune idée en base.");
+        return;
+      }
+
+      data.forEach((idea) => {
         const li = document.createElement("li");
-        li.textContent = i.title;
+        li.textContent = `${idea.id} - ${idea.title}`;
         list.appendChild(li);
       });
+
+      setStatus("Lecture OK.");
     }
 
     async function addIdea() {
-      const input = document.getElementById("input");
+      const title = input.value.trim();
 
-      await supabase.from('ideas').insert({
-        title: input.value
-      });
+      if (!title) {
+        setStatus("Le champ est vide.", true);
+        return;
+      }
 
+      setStatus("Insertion en cours...");
+
+      const { data, error } = await supabaseClient
+        .from("ideas")
+        .insert([{ title }])
+        .select();
+
+      if (error) {
+        console.error("Erreur insertion :", error);
+        setStatus("Erreur insertion : " + error.message, true);
+        return;
+      }
+
+      console.log("Insertion OK :", data);
       input.value = "";
-      loadIdeas();
+      setStatus("Insertion OK.");
+      await loadIdeas();
     }
+
+    addBtn.addEventListener("click", addIdea);
 
     loadIdeas();
   </script>
-
 </body>
 </html>
