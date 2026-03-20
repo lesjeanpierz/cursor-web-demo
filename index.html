@@ -10,6 +10,7 @@
 
   <input id="input" placeholder="Nouvelle idée" />
   <button id="addBtn">Ajouter</button>
+  <button id="deleteSelectedBtn" type="button">Supprimer sélection</button>
 
   <p id="status"></p>
 
@@ -25,6 +26,7 @@
 
     const input = document.getElementById("input");
     const addBtn = document.getElementById("addBtn");
+    const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
     const list = document.getElementById("list");
     const statusEl = document.getElementById("status");
 
@@ -39,7 +41,7 @@
       const { data, error } = await supabaseClient
         .from("ideas")
         .select("*")
-        .order("id", { ascending: false });
+        .order("id", { ascending: true });
 
       if (error) {
         console.error("Erreur lecture :", error);
@@ -56,7 +58,21 @@
 
       data.forEach((idea) => {
         const li = document.createElement("li");
-        li.textContent = `${idea.id} - ${idea.title}`;
+
+        // Case à cocher pour supprimer l'idée
+        const deleteCheckbox = document.createElement("input");
+        deleteCheckbox.type = "checkbox";
+        deleteCheckbox.className = "idea-delete-checkbox";
+        deleteCheckbox.style.marginRight = "8px";
+
+        // Permet d'identifier l'idée à supprimer même après un reload
+        deleteCheckbox.dataset.id = String(idea.id);
+
+        const titleText = document.createElement("span");
+        titleText.textContent = `${idea.id} - ${idea.title}`;
+
+        li.appendChild(deleteCheckbox);
+        li.appendChild(titleText);
         list.appendChild(li);
       });
 
@@ -91,6 +107,39 @@
     }
 
     addBtn.addEventListener("click", addIdea);
+
+    deleteSelectedBtn.addEventListener("click", async () => {
+      const checkedBoxes = Array.from(
+        list.querySelectorAll("input.idea-delete-checkbox:checked")
+      );
+      const ids = checkedBoxes
+        .map((cb) => cb.dataset.id)
+        .filter((id) => id !== undefined && id !== null);
+
+      if (ids.length === 0) {
+        setStatus("Aucune idée sélectionnée.", true);
+        return;
+      }
+
+      const confirmed = confirm(`Supprimer ${ids.length} idée(s) ?`);
+      if (!confirmed) return;
+
+      setStatus("Suppression en lot...");
+
+      const { error: deleteError } = await supabaseClient
+        .from("ideas")
+        .delete()
+        .in("id", ids);
+
+      if (deleteError) {
+        console.error("Erreur suppression :", deleteError);
+        setStatus("Erreur suppression : " + deleteError.message, true);
+        return;
+      }
+
+      setStatus("Suppression OK.");
+      await loadIdeas();
+    });
 
     loadIdeas();
   </script>
