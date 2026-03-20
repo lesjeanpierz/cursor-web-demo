@@ -3,19 +3,185 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Liste Idées</title>
+  <title>Toudou Liste</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #16a34a;
+      --primary-dark: #15803d;
+      --danger: #dc2626;
+      --danger-soft: #fff1f2;
+      --shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+        sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    input#input {
+      flex: 1 1 280px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      font-size: 14px;
+      outline: none;
+    }
+
+    input#input:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.25);
+    }
+
+    button {
+      padding: 11px 14px;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.05s ease, background 0.15s ease,
+        border-color 0.15s ease, opacity 0.15s ease;
+      user-select: none;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    #addBtn {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+
+    #addBtn:hover {
+      background: var(--primary-dark);
+    }
+
+    #deleteSelectedBtn {
+      background: white;
+      border-color: var(--border);
+      color: var(--danger);
+    }
+
+    #deleteSelectedBtn:hover {
+      background: var(--danger-soft);
+      border-color: #fca5a5;
+    }
+
+    #deleteSelectedBtn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      border-color: var(--border);
+      background: #f9fafb;
+      color: var(--muted);
+    }
+
+    .status {
+      min-height: 20px;
+      margin: 6px 0 16px;
+      color: var(--muted);
+    }
+
+    .ideas-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .idea-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .idea-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .idea-delete-checkbox {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .idea-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .idea-id {
+      color: var(--muted);
+      font-weight: 800;
+      margin-right: 6px;
+    }
+  </style>
 </head>
 <body>
-  <h1>Liste des idées</h1>
-  
+  <div class="container">
+    <h1>Liste des actions à faire</h1>
 
-  <input id="input" placeholder="Nouvelle idée" />
-  <button id="addBtn">Ajouter</button>
-  <button id="deleteSelectedBtn" type="button">Supprimer sélection</button>
+    <div class="toolbar">
+      <input id="input" placeholder="Nouvelle action" />
+      <button id="addBtn">Ajouter</button>
+      <button id="deleteSelectedBtn" type="button" disabled>Supprimer sélection</button>
+    </div>
 
-  <p id="status"></p>
+    <p id="status" class="status"></p>
 
-  <ul id="list"></ul>
+    <ul id="list" class="ideas-list"></ul>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -34,6 +200,18 @@
     function setStatus(message, isError = false) {
       statusEl.textContent = message;
       statusEl.style.color = isError ? "red" : "green";
+    }
+
+    function updateSelectionUI() {
+      const selectedCount = list.querySelectorAll(
+        "input.idea-delete-checkbox:checked"
+      ).length;
+
+      deleteSelectedBtn.disabled = selectedCount === 0;
+      deleteSelectedBtn.textContent =
+        selectedCount === 0
+          ? "Supprimer sélection"
+          : `Supprimer sélection (${selectedCount})`;
     }
 
     async function loadIdeas() {
@@ -59,25 +237,34 @@
 
       data.forEach((idea) => {
         const li = document.createElement("li");
+        li.className = "idea-item";
 
         // Case à cocher pour supprimer l'idée
         const deleteCheckbox = document.createElement("input");
         deleteCheckbox.type = "checkbox";
         deleteCheckbox.className = "idea-delete-checkbox";
-        deleteCheckbox.style.marginRight = "8px";
 
         // Permet d'identifier l'idée à supprimer même après un reload
         deleteCheckbox.dataset.id = String(idea.id);
 
-        const titleText = document.createElement("span");
-        titleText.textContent = `${idea.id} - ${idea.title}`;
+        const left = document.createElement("div");
+        left.className = "idea-left";
 
-        li.appendChild(deleteCheckbox);
-        li.appendChild(titleText);
+        const titleText = document.createElement("span");
+        titleText.className = "idea-title";
+        titleText.textContent = String(idea.title);
+
+        left.appendChild(deleteCheckbox);
+        left.appendChild(titleText);
+
+        li.appendChild(left);
         list.appendChild(li);
       });
 
-      setStatus("Lecture OK.");
+      // On évite d'afficher un message de succès systématique.
+      // (Le bouton "Supprimer sélection" et la liste restent mis à jour.)
+      setStatus("", false);
+      updateSelectionUI();
     }
 
     async function addIdea() {
@@ -142,6 +329,7 @@
       await loadIdeas();
     });
 
+    updateSelectionUI();
     loadIdeas();
   </script>
 </body>
