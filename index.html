@@ -296,6 +296,12 @@
 
     addBtn.addEventListener("click", addIdea);
 
+    list.addEventListener("change", (e) => {
+      if (!(e.target instanceof HTMLInputElement)) return;
+      if (!e.target.classList.contains("idea-delete-checkbox")) return;
+      updateSelectionUI();
+    });
+
     deleteSelectedBtn.addEventListener("click", async () => {
       const checkedBoxes = Array.from(
         list.querySelectorAll("input.idea-delete-checkbox:checked")
