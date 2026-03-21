@@ -8,6 +8,18 @@ const addBtn = document.getElementById("addBtn");
 const deleteSelectedBtn = document.getElementById("deleteSelectedBtn");
 const list = document.getElementById("list");
 const statusEl = document.getElementById("status");
+const TASK_COLORS = [
+  "#ff3366",
+  "#00c2ff",
+  "#ffc400",
+  "#00d98b",
+  "#b14dff",
+  "#ff7b00",
+  "#39ff14",
+  "#ff3df2",
+  "#00e5ff",
+  "#ff1744",
+];
 
 function setStatus(message, isError = false) {
   statusEl.textContent = message;
@@ -19,6 +31,11 @@ function updateSelectionUI() {
   deleteSelectedBtn.disabled = selectedCount === 0;
   deleteSelectedBtn.textContent =
     selectedCount === 0 ? "Supprimer sélection" : `Supprimer sélection (${selectedCount})`;
+}
+
+function getTaskColor(ideaId, index) {
+  const base = Number.isFinite(Number(ideaId)) ? Number(ideaId) : index;
+  return TASK_COLORS[Math.abs(base) % TASK_COLORS.length];
 }
 
 async function loadIdeas() {
@@ -43,9 +60,10 @@ async function loadIdeas() {
     return;
   }
 
-  data.forEach((idea) => {
+  data.forEach((idea, index) => {
     const li = document.createElement("li");
     li.className = "idea-item";
+    li.style.setProperty("--task-color", getTaskColor(idea.id, index));
 
     const deleteCheckbox = document.createElement("input");
     deleteCheckbox.type = "checkbox";

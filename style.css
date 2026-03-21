@@ -1,15 +1,16 @@
 :root {
-  --bg: #f6f7fb;
-  --card: #ffffff;
-  --text: #111827;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --primary: #16a34a;
-  --primary-dark: #15803d;
-  --danger: #dc2626;
-  --danger-soft: #fff1f2;
-  --shadow: 0 8px 20px rgba(17, 24, 39, 0.06);
-  --radius: 14px;
+  --bg-base: #fff8db;
+  --bg-warm: #ffd166;
+  --bg-orange: #ff7b00;
+  --ink: #2b1d0e;
+  --muted: #7c5b2a;
+  --paper: #fffdf1;
+  --paper-border: #2b1d0e;
+  --primary: #ff3366;
+  --primary-dark: #d11a4b;
+  --danger: #3126c9;
+  --danger-soft: #e7e6ff;
+  --radius: 18px;
 }
 
 * {
@@ -18,21 +19,35 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
+  font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 123, 0, 0.18) 0,
+      rgba(255, 123, 0, 0.18) 16px,
+      rgba(255, 209, 102, 0.12) 16px,
+      rgba(255, 209, 102, 0.12) 32px
+    ),
+    radial-gradient(circle at 18% 16%, rgba(255, 51, 102, 0.35) 0 120px, transparent 121px),
+    radial-gradient(circle at 82% 22%, rgba(49, 38, 201, 0.28) 0 140px, transparent 141px),
+    linear-gradient(120deg, var(--bg-base), #ffe8a3 40%, #ffd58f);
+  min-height: 100vh;
 }
 
 .container {
   max-width: 900px;
-  margin: 28px auto;
-  padding: 0 16px;
+  margin: 28px auto 42px;
+  padding: 0 16px 18px;
 }
 
 h1 {
   margin: 0 0 16px;
-  font-size: 24px;
-  letter-spacing: -0.02em;
+  font-size: 34px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #3f2600;
+  text-shadow: 2px 2px 0 #ffd166;
 }
 
 .toolbar {
@@ -41,44 +56,53 @@ h1 {
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 12px;
+  padding: 14px;
+  border: 3px solid var(--paper-border);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(90deg, rgba(255, 51, 102, 0.15), rgba(255, 209, 102, 0.25), rgba(49, 38, 201, 0.15)),
+    var(--paper);
+  box-shadow: 6px 6px 0 rgba(43, 29, 14, 0.85);
 }
 
 input#input {
   flex: 1 1 280px;
   padding: 12px 14px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--card);
+  border: 3px solid var(--paper-border);
+  border-radius: 14px;
+  background: #fffaf0;
   font-size: 14px;
   outline: none;
 }
 
 input#input:focus {
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 4px rgba(147, 197, 253, 0.25);
+  border-color: #ff3366;
+  box-shadow: 0 0 0 4px rgba(255, 51, 102, 0.22);
 }
 
 button {
-  padding: 11px 14px;
-  border: 1px solid transparent;
-  border-radius: 12px;
+  padding: 11px 16px;
+  border: 3px solid var(--paper-border);
+  border-radius: 999px;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  letter-spacing: 0.2px;
+  transition: transform 0.05s ease, background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
   user-select: none;
-  background: var(--card);
-  color: var(--text);
+  background: #fff7cc;
+  color: var(--ink);
+  box-shadow: 3px 3px 0 rgba(43, 29, 14, 0.8);
 }
 
 button:active {
-  transform: translateY(1px);
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(43, 29, 14, 0.8);
 }
 
 #addBtn {
   background: var(--primary);
-  color: white;
-  border-color: var(--primary-dark);
+  color: #fff;
 }
 
 #addBtn:hover {
@@ -86,28 +110,28 @@ button:active {
 }
 
 #deleteSelectedBtn {
-  background: white;
-  border-color: var(--border);
+  background: #fff;
   color: var(--danger);
 }
 
 #deleteSelectedBtn:hover {
   background: var(--danger-soft);
-  border-color: #fca5a5;
 }
 
 #deleteSelectedBtn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-  border-color: var(--border);
-  background: #f9fafb;
+  background: #f4eccc;
   color: var(--muted);
+  box-shadow: none;
 }
 
 .status {
   min-height: 20px;
   margin: 6px 0 16px;
-  color: var(--muted);
+  color: #4d2f00;
+  font-weight: 700;
+  letter-spacing: 0.2px;
 }
 
 .ideas-list {
@@ -124,11 +148,26 @@ button:active {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
+  padding: 12px 14px;
+  background:
+    linear-gradient(95deg, color-mix(in srgb, var(--task-color) 14%, #ffffff), #fff8dd);
+  border: 3px solid var(--paper-border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow:
+    2px 2px 0 rgba(43, 29, 14, 0.85),
+    inset 0 0 0 4px color-mix(in srgb, var(--task-color) 24%, transparent);
+  position: relative;
+}
+
+.idea-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  border-radius: 14px 0 0 14px;
+  background: var(--task-color);
 }
 
 .idea-left {
@@ -136,18 +175,19 @@ button:active {
   align-items: center;
   gap: 12px;
   min-width: 0;
+  margin-left: 8px;
 }
 
 .idea-delete-checkbox {
   width: 18px;
   height: 18px;
   cursor: pointer;
+  accent-color: var(--task-color);
 }
 
 .idea-title {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
+  color: #2c1a06;
+  letter-spacing: 0.15px;
 }
