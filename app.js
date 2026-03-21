@@ -64,6 +64,7 @@ async function loadIdeas() {
     const li = document.createElement("li");
     li.className = "idea-item";
     li.style.setProperty("--task-color", getTaskColor(idea.id, index));
+    li.style.setProperty("--task-index", String(index));
 
     const deleteCheckbox = document.createElement("input");
     deleteCheckbox.type = "checkbox";
