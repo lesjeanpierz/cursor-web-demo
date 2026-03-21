@@ -326,32 +326,8 @@ button:active {
   pointer-events: none;
 }
 
-.container::before {
-  right: 20px;
-  top: 80px;
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 32%, #fff6a9 0 16px, transparent 17px),
-    radial-gradient(circle at 64% 64%, #ff4973 0 18px, transparent 19px),
-    #ffcc00;
-  border: 3px solid #3c2506;
-  box-shadow: 4px 4px 0 rgba(43, 29, 14, 0.7);
-  transform: rotate(-12deg);
-}
 
-.container::after {
-  left: 20px;
-  bottom: 26px;
-  width: 128px;
-  height: 40px;
-  border-radius: 999px;
-  border: 3px solid #3c2506;
-  background: linear-gradient(90deg, #44ffd1, #00c2ff, #7d5fff);
-  box-shadow: 4px 4px 0 rgba(43, 29, 14, 0.7);
-  transform: rotate(-8deg);
-}
+
 
 @keyframes grainShift {
   0% {
